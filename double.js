@@ -1,0 +1,5 @@
+console.log('hello world!!');
+
+const dbl = (n) => n*2;
+
+console.log(dbl(10));
