@@ -6,7 +6,7 @@ console.log(process.env.MONGO_URL)
 
 const app = express();
 
-const PORT = 4000;
+const PORT = process.env.PORT;
 
 const movies = [
   {
@@ -152,7 +152,21 @@ app.get("/movies/:id", async function (request, response) {
     : response.status(404).send( { msg: " <movie not found> " });
 });
 
+app.delete("/movies/:id", async function (request, response) {
+    const { id } = request.params;
+    // console.log(request.params , id);
+    // // Db.movies.deleteOne({ id : 102 });
+    
+    const result = await client
+    .db('firstdb')
+    .collection('movies')
+    .deleteOne({ id : id });
 
+    console.log(result);
+    result.deletedCount > 0
+    ? response.send( { msg: " movie deleted successfully " })
+    : response.status(404).send( { msg: " <movie not found> " });
+});
 //   create movies
 // express.jsom -> middleware
 app.post("/movies", async function (request, response){
@@ -169,5 +183,20 @@ response.send(result);
 
 });
 
+app.put("/movies/:id", async function (request, response) {
+    const { id } = request.params;
+    const data = request.body;
+    // console.log(request.params , id);
+    // // Db.movies.updateOne({ id : 102 } ,{$set: data });
+  
+    const movie = await client
+    .db('firstdb')
+    .collection('movies')
+    .updateOne({ id : id } ,{$set: data });
+
+    console.log(movie);
+    movie ? response.send(movie)
+    : response.status(404).send( { msg: " <movie not found> " });
+});
 
 app.listen(PORT, () => console.log(`The server started in: ${PORT} ✨✨`));
